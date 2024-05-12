@@ -80,6 +80,46 @@ app.post('/api/usuarios', (req, res) => {
     );
 });
 
+// Rota para fazer login
+app.post('/api/login', (req, res) => {
+    const { email, senha } = req.body; // Recupera os dados de login do corpo da requisição
+    console.log(new Date().toLocaleString(), 'Fazendo login para o email:', email);
+    
+    // Executa uma consulta SQL para buscar o usuário com o email fornecido
+    connection.query(
+        'SELECT * FROM usuarios WHERE email = ?',
+        [email],
+        (error, results) => {
+            if (error) {
+                // Se ocorrer algum erro, envia uma mensagem de erro como resposta
+                console.error('Erro ao fazer login:', error);
+                res.status(500).json({ error: 'Erro ao fazer login' });
+                return;
+            }
+            
+            // Verifica se encontrou um usuário com o email fornecido
+            if (results.length === 0) {
+                // Se não encontrou um usuário, envia uma mensagem de erro como resposta
+                console.log('Usuário não encontrado.');
+                res.status(401).json({ error: 'Email ou senha incorretos' });
+                return;
+            }
+            
+            // Verifica se a senha fornecida coincide com a senha do usuário encontrado
+            if (results[0].senha !== senha) {
+                // Se a senha não coincide, envia uma mensagem de erro como resposta
+                console.log('Senha incorreta.');
+                res.status(401).json({ error: 'Email ou senha incorretos' });
+                return;
+            }
+            
+            // Se chegou até aqui, significa que o login foi bem-sucedido
+            console.log('Login bem-sucedido.');
+            res.json({ message: 'Login bem-sucedido', usuario: results[0] });
+        }
+    );
+});
+
 // Inicia o servidor na porta especificada
 app.listen(port, () => {
     console.log(`Servidor rodando em https://mycrudservernode-production.up.railway.app/:${port}`);
