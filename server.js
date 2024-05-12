@@ -1,9 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mysql = require('mysql2'); // Apenas uma importação do módulo mysql2 agora
+const mysql = require('mysql2');
+const http = require('http');
+const WebSocket = require('ws');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
 // Configurações do banco de dados MySQL
 const dbConfig = {
@@ -17,22 +22,15 @@ const dbConfig = {
     }
 };
 
-
-
 app.use(bodyParser.json());
 
 // Middleware para habilitar o CORS
 const cors = require('cors');
 const corsOptions = {
-  origin: 'https://paulos-website.000webhostapp.com', // Replace with your frontend origin
-  optionsSuccessStatus: 200, // Explicitly set 200 for preflight requests
+    origin: 'https://paulos-website.000webhostapp.com',
+    optionsSuccessStatus: 200,
 }
 app.use(cors(corsOptions));
-
-// Rota para a página inicial
-app.get('/', (req, res) => {
-    res.send('Bem-vindo à página inicial');
-});
 
 // Criação da conexão com o banco de dados MySQL
 const connection = mysql.createConnection(dbConfig);
@@ -122,26 +120,39 @@ app.post('/api/login', (req, res) => {
 
 // Rota para enviar uma nova mensagem
 app.post('/api/mensagens', (req, res) => {
-    const mensagem = req.body; // Recupera os dados da mensagem do corpo da requisição
-    console.log(new Date().toLocaleString(), 'Recebendo nova mensagem:', mensagem);
-    
-    // Executar a consulta SQL para inserir a nova mensagem no banco de dados
+    const mensagem = req.body;
+
+    // Insere a nova mensagem no banco de dados
     connection.query(
         'INSERT INTO mensagens (usuario, mensagem, data_envio) VALUES (?, ?, CURRENT_TIMESTAMP)',
         [mensagem.user, mensagem.message],
         (error, results) => {
             if (error) {
-                // Se ocorrer algum erro, enviar uma mensagem de erro como resposta
                 console.error('Erro ao inserir mensagem:', error);
                 res.status(500).json({ error: 'Erro ao inserir mensagem' });
                 return;
             }
-            
+
+            // Envia a nova mensagem para todos os clientes conectados via WebSocket
+            wss.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify(mensagem));
+                }
+            });
+
             console.log('Nova mensagem inserida com sucesso.');
-            // Enviar uma resposta de sucesso
             res.status(201).json({ message: 'Mensagem enviada com sucesso' });
         }
     );
+});
+
+// WebSocket server
+wss.on('connection', function connection(ws) {
+    console.log('Novo cliente conectado.');
+
+    ws.on('close', function close() {
+        console.log('Cliente desconectado.');
+    });
 });
 
 // Inicia o servidor na porta especificada
