@@ -146,6 +146,7 @@ app.post('/api/mensagens', (req, res) => {
     );
 });
 
+
 // WebSocket server
 wss.on('connection', function connection(ws) {
     console.log('Novo cliente conectado.');
