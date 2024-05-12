@@ -83,5 +83,5 @@ app.post('/api/usuarios', (req, res) => {
 
 // Inicia o servidor na porta especificada
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`Servidor rodando em https://mycrudservernode-production.up.railway.app/:${port}`);
 });
