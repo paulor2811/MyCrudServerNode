@@ -22,13 +22,8 @@ const dbConfig = {
 app.use(bodyParser.json());
 
 // Middleware para habilitar o CORS
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Permitir solicitações de qualquer origem
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
-});
+const cors = require('cors');
+app.use(cors());
 
 
 // Rota para a página inicial
