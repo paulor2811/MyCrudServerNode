@@ -24,6 +24,12 @@ const dbConfig = {
 
 app.use(bodyParser.json());
 
+// Middleware de log para registrar as requisições recebidas
+app.use((req, res, next) => {
+    console.log('Requisição recebida:', req.method, req.url);
+    next();
+});
+
 // Middleware para habilitar o CORS
 const cors = require('cors');
 const corsOptions = {
