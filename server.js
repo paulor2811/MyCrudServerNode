@@ -120,6 +120,30 @@ app.post('/api/login', (req, res) => {
     );
 });
 
+// Rota para enviar uma nova mensagem
+app.post('/api/mensagens', (req, res) => {
+    const mensagem = req.body; // Recupera os dados da mensagem do corpo da requisição
+    console.log(new Date().toLocaleString(), 'Recebendo nova mensagem:', mensagem);
+    
+    // Executar a consulta SQL para inserir a nova mensagem no banco de dados
+    connection.query(
+        'INSERT INTO mensagens (usuario, mensagem, data_envio) VALUES (?, ?, CURRENT_TIMESTAMP)',
+        [mensagem.user, mensagem.message],
+        (error, results) => {
+            if (error) {
+                // Se ocorrer algum erro, enviar uma mensagem de erro como resposta
+                console.error('Erro ao inserir mensagem:', error);
+                res.status(500).json({ error: 'Erro ao inserir mensagem' });
+                return;
+            }
+            
+            console.log('Nova mensagem inserida com sucesso.');
+            // Enviar uma resposta de sucesso
+            res.status(201).json({ message: 'Mensagem enviada com sucesso' });
+        }
+    );
+});
+
 // Inicia o servidor na porta especificada
 app.listen(port, () => {
     console.log(`Servidor rodando em https://mycrudservernode-production.up.railway.app/:${port}`);
