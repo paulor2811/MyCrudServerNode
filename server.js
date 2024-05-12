@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 // Middleware para habilitar o CORS
 const cors = require('cors');
 const corsOptions = {
-  origin: 'https://my-website-dh1skziap-paulos-projects-ede1d64c.vercel.app', // Replace with your frontend origin
+  origin: 'https://paulos-website.000webhostapp.com', // Replace with your frontend origin
   optionsSuccessStatus: 200, // Explicitly set 200 for preflight requests
 }
 app.use(cors(corsOptions));
