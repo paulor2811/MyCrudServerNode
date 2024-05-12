@@ -23,7 +23,11 @@ app.use(bodyParser.json());
 
 // Middleware para habilitar o CORS
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://my-website-dun-chi.vercel.app');
+    const allowedOrigins = ['https://my-website-dun-chi.vercel.app', 'https://my-website-dh1skziap-paulos-projects-ede1d64c.vercel.app']; // Adicione aqui os domínios permitidos
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     res.setHeader('Access-Control-Allow-Credentials', true);
