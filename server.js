@@ -24,11 +24,7 @@ const dbConfig = {
 
 app.use(bodyParser.json());
 
-// Middleware de log para registrar as requisições recebidas
-app.use((req, res, next) => {
-    console.log('Requisição recebida:', req.method, req.url);
-    next();
-});
+app.use(bodyParser.json());
 
 // Middleware para habilitar o CORS
 const cors = require('cors');
@@ -37,6 +33,12 @@ const corsOptions = {
     optionsSuccessStatus: 200,
 }
 app.use(cors(corsOptions));
+
+// Middleware de log para registrar as requisições recebidas
+app.use((req, res, next) => {
+    console.log('Requisição recebida:', req.method, req.url);
+    next();
+});
 
 // Criação da conexão com o banco de dados MySQL
 const connection = mysql.createConnection(dbConfig);
